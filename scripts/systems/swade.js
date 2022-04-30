@@ -3,28 +3,16 @@ import { settings } from "../settings.js";
 
 export function register_helper()
 {
-  logger.info(`Registering DND5E Helpers`);
-  /*
-    Override System Default
-  */
-  game.swade.rollWeaponMacro = (weaponName) => {
-    const speaker = ChatMessage.getSpeaker();
-    let actor;
-    if (speaker.token)
-        actor = game.actors.tokens[speaker.token];
-    if (!actor)
-        actor = game.actors.get(speaker.actor);
-    const item = actor
-        ? actor.items.find((i) => i.name === weaponName)
-        : null;
-    if (!item)
-        return ui.notifications.warn(`Your controlled Actor does not have an item named ${weaponName}`);
+  logger.info(`Registering SWADE Helpers`);
+  
+  Hooks.on("swadeAction", async (SwadeTokenOrActor, SwadeItem, SwadeAction, SwadeRoll, SwadeUserId) => {
+    //console.log([SwadeTokenOrActor, SwadeItem, SwadeAction, SwadeRoll, SwadeUserId]);  
     
-    if(item.hasMacro() && settings.value("defaultmacro"))
-      return item.executeMacro();
-    return item.rollDamage();
-  }
-
+    if( item.hasMacro() && settings.value("defaultmacro") ) {
+        //console.log([SwadeTokenOrActor, SwadeItem, SwadeAction, SwadeRoll, SwadeUserId]);
+        return SwadeItem.executeMacro(SwadeTokenOrActor, SwadeItem, SwadeAction, SwadeRoll, SwadeUserId);
+      }
+    });
 }
 
 export function sheetHooks()
